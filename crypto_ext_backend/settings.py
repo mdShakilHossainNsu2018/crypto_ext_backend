@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-azn4ttqvbj)1ihs7@^f@rzdd3&x*$8#x5zsxon06wr8amc+bzu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'chat',
     'core',
     'django_celery_results',
+    'django_celery_beat',
 
 ]
 
@@ -132,7 +133,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('redis', 6379)],
         },
     },
 }
@@ -145,7 +146,6 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 # For celery result
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
-
 
 # django setting.
 CACHES = {

@@ -1,12 +1,7 @@
-# Create your tasks here
+from crypto_ext_backend.celery import app
 
 
-from celery import shared_task
-
-from crypto_ext_backend.celery import app as celery_app
-
-
-@celery_app.task
+@app.task
 def test_task():
     print("Test print celery")
 

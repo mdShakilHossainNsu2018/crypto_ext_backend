@@ -21,6 +21,8 @@ def setup_periodic_tasks(sender, **kwargs):
     # Calls test('hello') every 10 seconds.
     from core.tasks import test_task
     sender.add_periodic_task(2.0, test_task.s(), name='add every 10')
+    from core.consumers import send_message
+    sender.add_periodic_task(5.0, send_message.s(), name='add every 10')
 
     # Calls test('world') every 30 seconds
     # sender.add_periodic_task(30.0, test.s('world'), expires=10)

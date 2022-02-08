@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  django:
+    build:
+      # . mean inside current directory
+      context: .
+      dockerfile: Dockerfile.dev
+
+    command:
+      - gunicorn
+      - crypto_ext_backend.wsgi:application
+      - --bind
+      - 0.0.0.0:8000
+#      - daphne -p 8001 crypto_ext_backend.asgi:application
+    depends_on:
+      - redis
+      - rabbitmq
+
+  channel:
+    image: django
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+
+    depends_on:
+      - redis
+      - rabbitmq
+      - django
+    command: "daphne crypto_ext_backend.asgi:application --bind 0.0.0.0 --port 9000"
+
+  nginx:
+    build:
+      context: ./nginx
+
+    depends_on:
+      - django
+    restart: on-failure
+    ports:
+      - "8000:80"
+  redis:
+    image: redis:latest
+    restart: on-failure
+    ports:
+      - "6378:6379"
+
+  rabbitmq:
+    image: rabbitmq:latest
+    restart: on-failure
+    ports:
+      - "5672:5672"
+
+
