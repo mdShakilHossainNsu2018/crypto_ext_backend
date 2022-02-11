@@ -154,3 +154,12 @@ CACHES = {
         'LOCATION': 'my_cache_table',
     }
 }
+
+# Django celery setup
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
+
+CRYPTO_GROUP = "CRYPTO_GROUP"
+CRYPTO_ROOM = "CRYPTO_ROOM"
+
+ETH_GAS_GROUP = "ETH_GROUP"
+BTC_GROUP = "BTC_GROUP"
