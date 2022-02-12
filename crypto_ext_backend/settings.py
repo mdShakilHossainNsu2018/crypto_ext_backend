@@ -147,6 +147,21 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 
+CELERY_IMPORTS = [
+    'core.consumers',
+]
+
+CELERY_BEAT_SCHEDULE = {
+      'send_crypto_message-10-sec': {
+        'task': 'core.consumers.send_crypto_message',
+        'schedule': 10.0,
+        # 'args': (16, 16),
+        'options': {
+            'expires': 5.0,
+        },
+    },
+}
+
 # django setting.
 CACHES = {
     'default': {

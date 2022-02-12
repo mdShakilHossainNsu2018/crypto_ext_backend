@@ -1,5 +1,6 @@
 import json
 from asgiref.sync import async_to_sync
+from celery import shared_task
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
 from crypto_ext_backend.celery import app
@@ -7,7 +8,7 @@ import requests
 from crypto_ext_backend.settings import BTC_GROUP, CRYPTO_GROUP, CRYPTO_ROOM
 
 
-@app.task
+@shared_task
 def send_crypto_message():
     # Send message to room group
     # {"symbol": "BTCUSDT", "price": "43592.48000000"},

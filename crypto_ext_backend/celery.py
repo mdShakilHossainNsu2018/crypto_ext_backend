@@ -16,22 +16,22 @@ app = Celery('crypto_ext_backend')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
 
-@app.on_after_configure.connect
-def setup_periodic_tasks(sender, **kwargs):
-    app.control.purge()
-    # Calls test('hello') every 10 seconds.
-
-    from core.consumers import send_crypto_message
-    sender.add_periodic_task(10.0, send_crypto_message.s(), name='Send Crypto Every in 5sec', expires=5)
-
-    # Calls test('world') every 30 seconds
-    # sender.add_periodic_task(30.0, test.s('world'), expires=10)
-
-    # Executes every Monday morning at 7:30 a.m.
-    # sender.add_periodic_task(
-    #     crontab(hour=7, minute=30, day_of_week=1),
-    #     test.s('Happy Mondays!'),
-    # )
+# @app.on_after_configure.connect
+# def setup_periodic_tasks(sender, **kwargs):
+#     app.control.purge()
+#     # Calls test('hello') every 10 seconds.
+#
+#     from core.consumers import send_crypto_message
+#     sender.add_periodic_task(10.0, send_crypto_message.s(), name='Send Crypto Every in 5sec', expires=5)
+#
+#     # Calls test('world') every 30 seconds
+#     # sender.add_periodic_task(30.0, test.s('world'), expires=10)
+#
+#     # Executes every Monday morning at 7:30 a.m.
+#     # sender.add_periodic_task(
+#     #     crontab(hour=7, minute=30, day_of_week=1),
+#     #     test.s('Happy Mondays!'),
+#     # )
 
 
 # Load task modules from all registered Django apps.
