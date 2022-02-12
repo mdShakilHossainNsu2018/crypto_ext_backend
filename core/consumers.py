@@ -14,7 +14,7 @@ def send_crypto_message():
     # {"symbol": "BTCUSDT", "price": "43592.48000000"},
     channel_layer = get_channel_layer()
     r = requests.get("https://api.binance.com/api/v3/ticker/price")
-    print(r.text)
+    # print(r.text)
     json_res = r.json()
 
     async_to_sync(channel_layer.group_send)(
