@@ -6,9 +6,11 @@ services:
       # . mean inside current directory
       context: .
       dockerfile: Dockerfile.dev
-
-    networks:
-      - main
+    volumes:
+      - ./:/usr/src/app
+      - static_volume:/usr/src/app/staticfiles
+    env_file:
+      - ./.env.dev
 
     command:
       - gunicorn
@@ -19,6 +21,17 @@ services:
     depends_on:
       - redis
       - rabbitmq
+      - db
+
+  db:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=hello_django
+      - POSTGRES_PASSWORD=hello_django
+      - POSTGRES_DB=hello_django_dev
+
 
   channel:
     image: django
@@ -26,8 +39,11 @@ services:
       context: .
       dockerfile: Dockerfile.dev
 
-    networks:
-      - main
+    restart: on-failure
+    volumes:
+      - ./:/usr/src/app
+    env_file:
+      - ./.env.dev
 
     depends_on:
       - redis
@@ -41,10 +57,14 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     command: sh -c "celery -A crypto_ext_backend worker -l info"
-    networks:
-      - main
+    volumes:
+      - ./:/usr/src/app
+    restart: on-failure
     depends_on:
       - django
+      - db
+    env_file:
+      - ./.env.dev
 
   celery_beat:
     image: django
@@ -52,27 +72,32 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     command:  sh -c "celery -A crypto_ext_backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
-    networks:
-      - main
+    restart: on-failure
+    volumes:
+      - ./:/usr/src/app
     depends_on:
       - celery_worker
+      - db
+    env_file:
+      - ./.env.dev
 
   nginx:
     build:
       context: ./nginx
 
+    volumes:
+
+      - ./:/usr/src/app
+      - static_volume:/usr/src/app/staticfiles
+
     depends_on:
       - django
-    networks:
-      - main
     restart: on-failure
     ports:
       - "8000:80"
   redis:
     image: redis:latest
     restart: on-failure
-    networks:
-      - main
     ports:
       - "6378:6379"
 
@@ -80,14 +105,14 @@ services:
     container_name: rabbitmq
     hostname: rabbitmq
     image: rabbitmq:latest
-    networks:
-      - main
     ports:
       - "5672:5672"
     restart: on-failure
 
+volumes:
+    static_volume:
+    postgres_data:
 
-networks:
-  main:
+
 
 

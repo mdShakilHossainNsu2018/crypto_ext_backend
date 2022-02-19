@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -36,14 +36,27 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_results',
+    'django_celery_beat',
+    'rest_framework',
 
     'channels',
     'chat',
     'core',
-    'django_celery_results',
-    'django_celery_beat',
+    'eth',
+    'errors',
 
 ]
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,10 +92,21 @@ WSGI_APPLICATION = 'crypto_ext_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
@@ -118,7 +142,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -134,6 +159,8 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [('redis', 6379)],
+            "capacity": 1500,  # default 100
+
         },
     },
 }
@@ -149,10 +176,11 @@ CELERY_CACHE_BACKEND = 'django-cache'
 
 CELERY_IMPORTS = [
     'core.consumers',
+    'eth.consumers',
 ]
 
 CELERY_BEAT_SCHEDULE = {
-      'send_crypto_message-10-sec': {
+    'send_crypto_message-10-sec': {
         'task': 'core.consumers.send_crypto_message',
         'schedule': 10.0,
         # 'args': (16, 16),
@@ -160,6 +188,15 @@ CELERY_BEAT_SCHEDULE = {
             'expires': 5.0,
         },
     },
+    'send_gas_message-10-sec': {
+        'task': 'eth.consumers.send_gas_message',
+        'schedule': 10.0,
+        # 'args': (16, 16),
+        'options': {
+            'expires': 5.0,
+        },
+    },
+
 }
 
 # django setting.
@@ -176,5 +213,7 @@ CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
 CRYPTO_GROUP = "CRYPTO_GROUP"
 CRYPTO_ROOM = "CRYPTO_ROOM"
 
-ETH_GAS_GROUP = "ETH_GROUP"
+ETH_GAS_GROUP = "ETH_GAS_GROUP"
+ETH_GAS_ROOM = "ETH_GAS_ROOM"
+
 BTC_GROUP = "BTC_GROUP"

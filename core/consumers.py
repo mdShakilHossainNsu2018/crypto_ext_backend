@@ -3,9 +3,11 @@ from asgiref.sync import async_to_sync
 from celery import shared_task
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
-from crypto_ext_backend.celery import app
+from core.models import CryptoData
 import requests
 from crypto_ext_backend.settings import BTC_GROUP, CRYPTO_GROUP, CRYPTO_ROOM
+from errors.models import ErrorData, Errors
+from channels.db import database_sync_to_async
 
 
 @shared_task
@@ -16,6 +18,23 @@ def send_crypto_message():
     r = requests.get("https://api.binance.com/api/v3/ticker/price")
     # print(r.text)
     json_res = r.json()
+
+    # if r.status_code != 200:
+    #     ErrorData.objects.create(error_from=f"send_crypto_message state code {r.status_code}",
+    #                              message=r.text,
+    #                              error_type=Errors.TOO_MANY_REQ
+    #                              )
+
+    # if r.status_code == 200:
+    #     # print(r.json())
+    #     try:
+    #         CryptoData.objects.create(data=json_res)
+    #     except Exception as e:
+    #         ErrorData.objects.create(error_from=f"send_crypto_message unable to create data",
+    #                                  message=str(e),
+    #                                  error_type=Errors.DB_ERROR
+    #                                  )
+    #         print(e)
 
     async_to_sync(channel_layer.group_send)(
         # Broadcast to crypto group
@@ -103,6 +122,20 @@ class AllCryptoConsumer(WebsocketConsumer):
 
         self.accept()
 
+        # Sending initial message
+
+        crypto_data = CryptoData.objects.all()
+
+        for obj in crypto_data:
+            async_to_sync(self.channel_layer.group_send)(
+                # Broadcast to crypto group
+                CRYPTO_GROUP,
+                {
+                    'type': 'initial_message',
+                    'message': obj.as_dict()
+                }
+            )
+
     def disconnect(self, close_code):
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
@@ -118,3 +151,11 @@ class AllCryptoConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message
         }))
+
+    def initial_message(self, event):
+            message = event['message']
+
+            # Send message to WebSocket
+            self.send(text_data=json.dumps({
+                'initial_message': message
+            }))

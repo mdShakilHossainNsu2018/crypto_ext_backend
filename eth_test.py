@@ -9,7 +9,6 @@ pending = w3.eth.getBlock("pending")
 gas_price1 = w3.eth.gasPrice
 gwi = w3.fromWei(gas_price1, 'gwei')
 
-
 print(gwi)
 
 print(pending["number"])

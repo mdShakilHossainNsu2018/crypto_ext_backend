@@ -12,6 +12,8 @@ Icon
 # Thumbnails
 ._*
 
+.env.dev
+.env
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
@@ -85,5 +87,4 @@ target/
 __pycache__/
 local_settings.py
 
-.env
 db.sqlite3
