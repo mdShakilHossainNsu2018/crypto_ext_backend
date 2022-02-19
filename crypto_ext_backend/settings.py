@@ -202,9 +202,9 @@ CELERY_BEAT_SCHEDULE = {
 
     'cleanup_core': {
         'task': 'core.tasks.clean_up_core_object',
-        'schedule': crontab(),
+        # 'schedule': crontab(),
         # midnight
-        # 'schedule': crontab(minute=0, hour=0),
+        'schedule': crontab(minute=0, hour=0),
         'options': {
             'expires': 5.0,
         },
@@ -212,9 +212,9 @@ CELERY_BEAT_SCHEDULE = {
 
     'cleanup_eth': {
         'task': 'eth.tasks.clean_up_eth_object',
-        'schedule': crontab(),
+        # 'schedule': crontab(),
         # midnight
-        # 'schedule': crontab(minute=0, hour=0),
+        'schedule': crontab(minute=0, hour=0),
         'options': {
             'expires': 5.0,
         },
@@ -222,9 +222,9 @@ CELERY_BEAT_SCHEDULE = {
 
     'cleanup_errors': {
         'task': 'errors.tasks.clean_up_error_object',
-        'schedule': crontab(),
+        # 'schedule': crontab(),
         # midnight
-        # 'schedule': crontab(minute=0, hour=0),
+        'schedule': crontab(minute=0, hour=0),
         'options': {
             'expires': 5.0,
         },
