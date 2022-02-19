@@ -13,6 +13,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from celery.schedules import crontab
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -48,7 +50,6 @@ INSTALLED_APPS = [
 
 ]
 
-
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -56,7 +57,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -177,6 +177,9 @@ CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_IMPORTS = [
     'core.consumers',
     'eth.consumers',
+    'core.tasks',
+    'eth.tasks',
+    'errors.tasks',
 ]
 
 CELERY_BEAT_SCHEDULE = {
@@ -192,6 +195,36 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'eth.consumers.send_gas_message',
         'schedule': 10.0,
         # 'args': (16, 16),
+        'options': {
+            'expires': 5.0,
+        },
+    },
+
+    'cleanup_core': {
+        'task': 'core.tasks.clean_up_core_object',
+        'schedule': crontab(),
+        # midnight
+        # 'schedule': crontab(minute=0, hour=0),
+        'options': {
+            'expires': 5.0,
+        },
+    },
+
+    'cleanup_eth': {
+        'task': 'eth.tasks.clean_up_eth_object',
+        'schedule': crontab(),
+        # midnight
+        # 'schedule': crontab(minute=0, hour=0),
+        'options': {
+            'expires': 5.0,
+        },
+    },
+
+    'cleanup_errors': {
+        'task': 'errors.tasks.clean_up_error_object',
+        'schedule': crontab(),
+        # midnight
+        # 'schedule': crontab(minute=0, hour=0),
         'options': {
             'expires': 5.0,
         },
