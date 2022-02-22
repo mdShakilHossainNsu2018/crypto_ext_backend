@@ -11,7 +11,7 @@ services:
       - static_volume:/usr/src/app/staticfiles
     env_file:
       - ./.env.dev
-
+    restart: unless-stopped
     command:
       - gunicorn
       - crypto_ext_backend.wsgi:application
@@ -31,7 +31,7 @@ services:
       - POSTGRES_USER=hello_django
       - POSTGRES_PASSWORD=hello_django
       - POSTGRES_DB=hello_django_dev
-
+    restart: unless-stopped
 
   channel:
     image: django
@@ -39,7 +39,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
 
-    restart: on-failure
+    restart: unless-stopped
     volumes:
       - ./:/usr/src/app
     env_file:
@@ -59,7 +59,7 @@ services:
     command: sh -c "celery -A crypto_ext_backend worker -l info"
     volumes:
       - ./:/usr/src/app
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - django
       - db
@@ -72,7 +72,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     command:  sh -c "celery -A crypto_ext_backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
-    restart: on-failure
+    restart: unless-stopped
     volumes:
       - ./:/usr/src/app
     depends_on:
@@ -92,12 +92,12 @@ services:
 
     depends_on:
       - django
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "8000:80"
   redis:
     image: redis:latest
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "6378:6379"
 
@@ -107,7 +107,7 @@ services:
     image: rabbitmq:latest
     ports:
       - "5672:5672"
-    restart: on-failure
+    restart: unless-stopped
 
 volumes:
     static_volume:
