@@ -44,40 +44,45 @@ def send_crypto_message():
         }
     )
     BTCUSDT = 0
-    ETHBTC = 0
-    ETHUSDT = 0
-    BNBETH = 0
-    ETHTUSD = 0
-    TUSDBNB = 0
+    # ETHBTC = 0
+    # ETHUSDT = 0
+    # BNBETH = 0
+    # ETHTUSD = 0
+    # TUSDBNB = 0
+
+    all_pair_dict = {}
+
     for obj in json_res:
+        all_pair_dict[obj["symbol"]] = obj["price"]
+
         if obj["symbol"] == "BTCUSDT":
             BTCUSDT = obj["price"]
-        if obj["symbol"] == "ETHBTC":
-            ETHBTC = obj["price"]
-        if obj["symbol"] == "ETHUSDT":
-            ETHUSDT = obj["price"]
-        if obj["symbol"] == "BNBETH":
-            BNBETH = obj["price"]
-        if obj["symbol"] == "ETHTUSD":
-            ETHTUSD = obj["price"]
-        if obj["symbol"] == "TUSDBNB":
-            TUSDBNB = obj["price"]
+        # if obj["symbol"] == "ETHBTC":
+        #     ETHBTC = obj["price"]
+        # if obj["symbol"] == "ETHUSDT":
+        #     ETHUSDT = obj["price"]
+        # if obj["symbol"] == "BNBETH":
+        #     BNBETH = obj["price"]
+        # if obj["symbol"] == "ETHTUSD":
+        #     ETHTUSD = obj["price"]
+        # if obj["symbol"] == "TUSDBNB":
+        #     TUSDBNB = obj["price"]
 
-    alarm_obj = {
-        "BTCUSDT": BTCUSDT,
-        "ETHBTC": ETHBTC,
-        "ETHUSDT": ETHUSDT,
-        "BNBETH": BNBETH,
-        "ETHTUSD": ETHTUSD,
-        "TUSDBNB": TUSDBNB
-    }
+    # alarm_obj = {
+    #     "BTCUSDT": BTCUSDT,
+    #     "ETHBTC": ETHBTC,
+    #     "ETHUSDT": ETHUSDT,
+    #     "BNBETH": BNBETH,
+    #     "ETHTUSD": ETHTUSD,
+    #     "TUSDBNB": TUSDBNB
+    # }
 
     async_to_sync(channel_layer.group_send)(
         # It is the btc group name
         CRYPTO_ALARM_GROUP,
         {
             'type': 'chat_message',
-            'message': alarm_obj
+            'message': all_pair_dict
         }
     )
 
