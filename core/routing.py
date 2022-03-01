@@ -7,5 +7,6 @@ from django.urls import path
 websocket_urlpatterns = [
     path('ws/binance/btc/', consumers.BTCConsumer.as_asgi()),
     path('ws/binance/all/price/', consumers.AllCryptoConsumer.as_asgi()),
+    path('ws/alarm/all/price/', consumers.CryptoAlarmConsumer.as_asgi()),
 ]
 

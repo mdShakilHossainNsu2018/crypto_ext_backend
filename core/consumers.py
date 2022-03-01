@@ -3,9 +3,8 @@ from asgiref.sync import async_to_sync
 from celery import shared_task
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
-from core.models import CryptoData
 import requests
-from crypto_ext_backend.settings import BTC_GROUP, CRYPTO_GROUP, CRYPTO_ROOM
+from crypto_ext_backend.settings import BTC_GROUP, CRYPTO_GROUP, CRYPTO_ROOM, CRYPTO_ALARM_ROOM, CRYPTO_ALARM_GROUP
 from errors.models import ErrorData, Errors
 from channels.db import database_sync_to_async
 
@@ -44,18 +43,52 @@ def send_crypto_message():
             'message': json_res
         }
     )
-
+    BTCUSDT = 0
+    ETHBTC = 0
+    ETHUSDT = 0
+    BNBETH = 0
+    ETHTUSD = 0
+    TUSDBNB = 0
     for obj in json_res:
         if obj["symbol"] == "BTCUSDT":
-            print(obj["price"])
-            async_to_sync(channel_layer.group_send)(
-                # It is the btc group name
-                "group_" + BTC_GROUP,
-                {
-                    'type': 'chat_message',
-                    'message': obj["price"]
-                }
-            )
+            BTCUSDT = obj["price"]
+        if obj["symbol"] == "ETHBTC":
+            ETHBTC = obj["price"]
+        if obj["symbol"] == "ETHUSDT":
+            ETHUSDT = obj["price"]
+        if obj["symbol"] == "BNBETH":
+            BNBETH = obj["price"]
+        if obj["symbol"] == "ETHTUSD":
+            ETHTUSD = obj["price"]
+        if obj["symbol"] == "TUSDBNB":
+            TUSDBNB = obj["price"]
+
+    alarm_obj = {
+        "BTCUSDT": BTCUSDT,
+        "ETHBTC": ETHBTC,
+        "ETHUSDT": ETHUSDT,
+        "BNBETH": BNBETH,
+        "ETHTUSD": ETHTUSD,
+        "TUSDBNB": TUSDBNB
+    }
+
+    async_to_sync(channel_layer.group_send)(
+        # It is the btc group name
+        CRYPTO_ALARM_GROUP,
+        {
+            'type': 'chat_message',
+            'message': alarm_obj
+        }
+    )
+
+    async_to_sync(channel_layer.group_send)(
+        # It is the btc group name
+        "group_" + BTC_GROUP,
+        {
+            'type': 'chat_message',
+            'message': BTCUSDT
+        }
+    )
 
 
 class BTCConsumer(WebsocketConsumer):
@@ -122,20 +155,6 @@ class AllCryptoConsumer(WebsocketConsumer):
 
         self.accept()
 
-        # Sending initial message
-
-        crypto_data = CryptoData.objects.all()
-
-        for obj in crypto_data:
-            async_to_sync(self.channel_layer.group_send)(
-                # Broadcast to crypto group
-                CRYPTO_GROUP,
-                {
-                    'type': 'initial_message',
-                    'message': obj.as_dict()
-                }
-            )
-
     def disconnect(self, close_code):
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
@@ -152,10 +171,37 @@ class AllCryptoConsumer(WebsocketConsumer):
             'message': message
         }))
 
-    def initial_message(self, event):
-            message = event['message']
 
-            # Send message to WebSocket
-            self.send(text_data=json.dumps({
-                'initial_message': message
-            }))
+class CryptoAlarmConsumer(WebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.room_group_name = CRYPTO_ALARM_GROUP
+        self.room_name = CRYPTO_ALARM_ROOM
+
+    def connect(self):
+        # self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_name = CRYPTO_ALARM_ROOM
+        self.room_group_name = CRYPTO_ALARM_GROUP
+
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+        self.accept()
+
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # Receive message from room group
+    def chat_message(self, event):
+        message = event['message']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'message': message
+        }))
