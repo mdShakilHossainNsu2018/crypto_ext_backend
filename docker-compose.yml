@@ -49,7 +49,7 @@ services:
       - redis
       - rabbitmq
       - django
-    command: "uvicorn --workers 5 crypto_ext_backend.asgi:application --bind 0.0.0.0 --port 9000"
+    command: "uvicorn --workers 5 crypto_ext_backend.asgi:application --port 9000"
 
   celery_worker:
     image: django
