@@ -9,8 +9,7 @@ from errors.models import ErrorData, Errors
 from channels.db import database_sync_to_async
 
 
-@shared_task
-async def send_crypto_message():
+async def async_task():
     # Send message to room group
     # {"symbol": "BTCUSDT", "price": "43592.48000000"},
     channel_layer = await get_channel_layer()
@@ -77,7 +76,11 @@ async def send_crypto_message():
             'message': BTCUSDT
         }
     )
-    return True
+
+
+@shared_task
+def send_crypto_message():
+    async_to_sync(async_task())()
 
 
 class BTCConsumer(AsyncWebsocketConsumer):
