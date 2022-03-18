@@ -18,23 +18,6 @@ def send_crypto_message():
     # print(r.text)
     json_res = r.json()
 
-    # if r.status_code != 200:
-    #     ErrorData.objects.create(error_from=f"send_crypto_message state code {r.status_code}",
-    #                              message=r.text,
-    #                              error_type=Errors.TOO_MANY_REQ
-    #                              )
-
-    # if r.status_code == 200:
-    #     # print(r.json())
-    #     try:
-    #         CryptoData.objects.create(data=json_res)
-    #     except Exception as e:
-    #         ErrorData.objects.create(error_from=f"send_crypto_message unable to create data",
-    #                                  message=str(e),
-    #                                  error_type=Errors.DB_ERROR
-    #                                  )
-    #         print(e)
-
     async_to_sync(channel_layer.group_send)(
         # Broadcast to crypto group
         CRYPTO_GROUP,
