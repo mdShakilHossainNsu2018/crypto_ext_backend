@@ -77,6 +77,7 @@ async def send_crypto_message():
             'message': BTCUSDT
         }
     )
+    return True
 
 
 class BTCConsumer(AsyncWebsocketConsumer):
