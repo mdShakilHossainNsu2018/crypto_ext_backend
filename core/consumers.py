@@ -13,7 +13,7 @@ from channels.db import database_sync_to_async
 async def async_task():
     # Send message to room group
     # {"symbol": "BTCUSDT", "price": "43592.48000000"},
-    channel_layer = await get_channel_layer()
+    channel_layer = get_channel_layer()
     r = requests.get("https://api.binance.com/api/v3/ticker/price")
     # print(r.text)
     json_res = await r.json()
