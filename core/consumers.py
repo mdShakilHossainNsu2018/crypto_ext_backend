@@ -10,15 +10,15 @@ from channels.db import database_sync_to_async
 
 
 @shared_task
-def send_crypto_message():
+async def send_crypto_message():
     # Send message to room group
     # {"symbol": "BTCUSDT", "price": "43592.48000000"},
-    channel_layer = get_channel_layer()
+    channel_layer = await get_channel_layer()
     r = requests.get("https://api.binance.com/api/v3/ticker/price")
     # print(r.text)
-    json_res = r.json()
+    json_res = await r.json()
 
-    async_to_sync(channel_layer.group_send)(
+    await channel_layer.group_send(
         # Broadcast to crypto group
         CRYPTO_GROUP,
         {
@@ -60,7 +60,7 @@ def send_crypto_message():
     #     "TUSDBNB": TUSDBNB
     # }
 
-    async_to_sync(channel_layer.group_send)(
+    await channel_layer.group_send(
         # It is the btc group name
         CRYPTO_ALARM_GROUP,
         {
@@ -69,7 +69,7 @@ def send_crypto_message():
         }
     )
 
-    async_to_sync(channel_layer.group_send)(
+    await channel_layer.group_send(
         # It is the btc group name
         "group_" + BTC_GROUP,
         {
