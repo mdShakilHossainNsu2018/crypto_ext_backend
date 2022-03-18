@@ -16,7 +16,7 @@ async def async_task():
     channel_layer = get_channel_layer()
     r = requests.get("https://api.binance.com/api/v3/ticker/price")
     # print(r.text)
-    json_res = await r.json()
+    json_res = r.json()
 
     await channel_layer.group_send(
         # Broadcast to crypto group
