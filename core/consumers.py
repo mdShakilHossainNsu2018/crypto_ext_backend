@@ -1,3 +1,4 @@
+import asyncio
 import json
 from asgiref.sync import async_to_sync
 from celery import shared_task
@@ -80,7 +81,7 @@ async def async_task():
 
 @shared_task
 def send_crypto_message():
-    async_to_sync(async_task())()
+    asyncio.run(async_task())
 
 
 class BTCConsumer(AsyncWebsocketConsumer):
