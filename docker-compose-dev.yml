@@ -12,11 +12,9 @@ services:
     env_file:
       - ./.env.dev
     restart: unless-stopped
-    command:
-      - gunicorn
-      - crypto_ext_backend.wsgi:application
-      - --bind
-      - 0.0.0.0:8000
+    command: gunicorn crypto_ext_backend.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
 #      - daphne -p 8001 crypto_ext_backend.asgi:application
     depends_on:
       - redis
@@ -80,20 +78,6 @@ services:
       - db
     env_file:
       - ./.env.dev
-
-  nginx:
-    build:
-      context: ./nginx
-    volumes:
-      - ./:/usr/src/app
-      - static_volume:/usr/src/app/staticfiles
-    depends_on:
-      - django
-      - db
-    restart: unless-stopped
-    ports:
-      - "8000:80"
-
 
   redis:
     image: redis:latest
