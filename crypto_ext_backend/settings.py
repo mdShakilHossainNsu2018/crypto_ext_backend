@@ -112,9 +112,9 @@ WSGI_APPLICATION = 'crypto_ext_backend.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql", #os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get('POSTGRES_NAME'),# os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
-        "USER": os.environ.get('POSTGRES_USER'),
-        "PASSWORD": os.environ.get('POSTGRES_PASSWORD'),
+        "NAME": 'postgres',# os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": 'postgres',
+        "PASSWORD": 'postgres',
         "HOST": 'db',
         "PORT": 5432,
     }
