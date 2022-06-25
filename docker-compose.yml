@@ -23,13 +23,15 @@ services:
       - 0.0.0.0:8000
 #      - daphne -p 8001 crypto_ext_backend.asgi:application
     depends_on:
+      - db
       - redis
       - rabbitmq
-      - db
 
   db:
     image: postgres:14.4
     container_name: db
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
