@@ -106,3 +106,5 @@ zipp==3.7.0
 zope.interface==5.4.0
 
 cloudscraper==1.2.60
+
+django-cors-headers==3.13.0

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
     'rest_framework',
+    "corsheaders",
 
     'channels',
     'chat',
@@ -63,12 +64,15 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'crypto_ext_backend.urls'
 
@@ -111,8 +115,8 @@ WSGI_APPLICATION = 'crypto_ext_backend.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql", #os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": 'postgres',# os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "ENGINE": "django.db.backends.postgresql",  # os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": 'postgres',  # os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
         "USER": 'postgres',
         "PASSWORD": 'postgres',
         "HOST": 'db',
