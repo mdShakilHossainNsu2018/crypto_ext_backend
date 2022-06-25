@@ -104,3 +104,5 @@ web3==5.27.0
 yarl==1.7.2
 zipp==3.7.0
 zope.interface==5.4.0
+
+cloudscraper==1.2.60

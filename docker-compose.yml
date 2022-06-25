@@ -12,6 +12,10 @@ services:
     env_file:
       - ./.env.dev
     restart: unless-stopped
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     command:
       - gunicorn
       - crypto_ext_backend.wsgi:application
@@ -24,13 +28,14 @@ services:
       - db
 
   db:
-    image: postgres:latest
+    image: postgres:14.4
+    container_name: db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=hello_django
-      - POSTGRES_PASSWORD=hello_django
-      - POSTGRES_DB=hello_django_dev
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     restart: unless-stopped
 
   channel:

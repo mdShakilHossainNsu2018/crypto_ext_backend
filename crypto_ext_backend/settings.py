@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from celery.schedules import crontab
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'core',
     'eth',
     'errors',
+    'top_gainer_losser',
 
 ]
 
@@ -96,6 +98,25 @@ WSGI_APPLICATION = 'crypto_ext_backend.wsgi.application'
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+# SQL_ENGINE=django.db.backends.postgresql
+# SQL_DATABASE=hello_django_dev
+# SQL_USER=hello_django
+# SQL_PASSWORD=hello_django
+# SQL_HOST=db
+# SQL_PORT=5432
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql", #os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+#         "NAME": os.environ.get('POSTGRES_NAME'),# os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+#         "USER": os.environ.get('POSTGRES_USER'),
+#         "PASSWORD": os.environ.get('POSTGRES_PASSWORD'),
+#         "HOST": 'db',
+#         "PORT": 5432,
 #     }
 # }
 
@@ -180,6 +201,7 @@ CELERY_IMPORTS = [
     'core.tasks',
     'eth.tasks',
     'errors.tasks',
+    'top_gainer_losser.tasks'
 ]
 
 CELERY_BEAT_SCHEDULE = {
@@ -198,6 +220,15 @@ CELERY_BEAT_SCHEDULE = {
         'options': {
             'expires': 5.0,
         },
+    },
+    'get_and_save_gainer_losser_object': {
+        'task': 'top_gainer_losser.tasks.get_and_save_gainer_losser_object',
+        'schedule': timedelta(minutes=30),
+    },
+
+    'get_and_save_crypto_top_gainer_loser': {
+        'task': 'top_gainer_losser.tasks.get_and_save_crypto_top_gainer_loser',
+        'schedule': timedelta(minutes=2),
     },
 
     'cleanup_core': {
