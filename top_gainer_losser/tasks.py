@@ -12,12 +12,12 @@ def get_and_save_gainer_losser_object():
     stock_gainer()
     stock_losser()
 
+
 @shared_task
 def get_and_save_crypto_top_gainer_loser():
     scraper = cloudscraper.create_scraper()
     # res = requests.get("https://www.coingecko.com/en/crypto-gainers-losers")
     soup = BeautifulSoup(scraper.get("https://www.coingecko.com/en/crypto-gainers-losers").text, 'html.parser')
-    print(soup.prettify())
     table = soup.find_all('table', {'id': 'gecko-table-all'})
 
     save_crypto_gainer(table[0])
